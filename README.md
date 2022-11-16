@@ -1,11 +1,32 @@
-CST8109
+#### CST8109
 # Subnet Calculator
 Simple Calculator with a text based GUI
-Deals with:
-  [1] GIP/HIP
-  [2] GSM
-  [3] s
-  [4] S
-  [5] h
-  [6] Total HIP
-  [7] Usable HIP
+
+Variables:
+* _GIP/HIP_
+
+  Given IP or Host IP
+
+* _GSM_
+
+  Siven Subnet Mask or Host IP Mask
+
+* _s_
+
+  Amount of subnets can be created
+
+* _S_
+
+  Amount of host bits
+
+* _h_
+
+  Amount of host bits
+
+* Total _HIP_
+
+  Amount of host IP can be created
+
+* Usable _HIP_
+
+  Amount of usable host IP
