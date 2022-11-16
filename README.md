@@ -9,15 +9,15 @@ Variables:
 
 * _GSM_
 
-  Siven Subnet Mask or Host IP Mask
+  Given Subnet Mask or Host IP Mask
 
 * _s_
 
-  Amount of subnets can be created
+  Amount of borrowed bits
 
 * _S_
 
-  Amount of host bits
+  Amount of subnets can be created
 
 * _h_
 
