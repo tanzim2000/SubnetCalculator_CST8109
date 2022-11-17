@@ -30,3 +30,7 @@ Variables:
 * Usable _HIP_
 
   Amount of usable host IP
+
+* sID
+
+ Subnetwork Address, wired ID, Network ID
