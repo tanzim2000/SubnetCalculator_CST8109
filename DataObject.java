@@ -4,6 +4,10 @@
  * @version 1.0
  */
 public class DataObject {
+	/** Total amount of binary bit in an octet of IPv4*/
+	private final int TOTAL_BIT_IN_IPv4OCTET = 8;
+	/** Total amount of Octet in IPv4*/
+	private final int TOTAL_OCTET_IN_IPv4 = 4;
 	/** given IP */
 	private int[] gIP;
 	/** subnet class [ABCDEF] */
@@ -26,22 +30,24 @@ public class DataObject {
 	private int hIP; 
 	/** amount of usable host IP */
 	private int usableHIp; 
-	/** subnet IP, wired ID, Network IP */
-	private int[] sIP = new int[4];
+	/** Subnetwork Address, wired ID, Network ID */
+	private int[] sID;
+	/** Subnetwork Address in Binary */
+	private int[][] sIDinBinary;
 	//other variables
 	private boolean calculateBorrowedBits = true;
 	private char subnetClassMaskedOctetAmount;
 	
 	
 	/**
-	 * @return {@code int[]} the gIP
+	 * @return {@code int[]} gIP
 	 */
 	public int[] getGIP() {
 		return gIP;
 	}
 	/**
 	 * modifier for gIP (given IP)
-	 * also provokes modifiers for subnet class
+	 * also provokes modifiers for subnetwork class
 	 * @param gIP the gIP to set
 	 */
 	public void setGIP(int[] gIP) {
@@ -55,12 +61,13 @@ public class DataObject {
 				ipIsValid = false;
 			}
 		}
-			if (ipIsValid) {
-				this.gIP = gIP;
-				this.setSubnetClass();
-			} else {
-				System.err.println("setting GIP failed!");
-			}
+		if (ipIsValid) {
+			this.gIP = gIP;
+			this.setSubnetClass();
+			this.setSIDinBinary();
+		} else {
+			System.err.println("setting GIP failed!");
+		}
 	}
 	/**
 	 * @return Class of the gIP (given IP) in {@code char}
@@ -89,6 +96,7 @@ public class DataObject {
 		} else if (gIP[0] > 240 && gIP[0] <= 254) {
 			subnetClass = 'E';
 		}
+		//provoking other modifiers
 		this.setDSMslashValue();
 	}
 	/**
@@ -103,15 +111,16 @@ public class DataObject {
 	private void setDSMslashValue() {
 		switch (subnetClass) {
 		case 'A':
-			this.dSMslashValue = 8;
+			this.dSMslashValue = TOTAL_BIT_IN_IPv4OCTET * 1;
 			break;
 		case 'B':
-			this.dSMslashValue = 16;
+			this.dSMslashValue = TOTAL_BIT_IN_IPv4OCTET * 2;
 			break;
 		case 'C':
-			this.dSMslashValue = 24;
+			this.dSMslashValue = TOTAL_BIT_IN_IPv4OCTET * 3;
 			break;
 		}
+		//provoking other modifiers
 		if (dSM == null) {
 			this.setDSM();
 		}
@@ -143,6 +152,7 @@ public class DataObject {
 		for (int index = 0; index < oct; index++) {
 			dSM[index] = 255;
 		}
+		//provoking other modifiers
 		this.setDSMslashValue();
 	}
 	/**
@@ -169,7 +179,9 @@ public class DataObject {
 				System.err.println("setting GSM failed!");
 			} // end if-else
 		} //end of for loop
+		//provoking other modifiers
 		this.setGSMslashValue();
+		this.setSIDinBinary();
 	}
 	/**
 	 * @return the gSMslashValue {@code int}
@@ -192,12 +204,13 @@ public class DataObject {
 			} //end binary[] iterator
 		}//end gSM iterator
 		//provoking other modifiers
-		int borrowedbit = this.gSMslashValue - (((int)this.gSMslashValue/8) * 8);
+		int borrowedbit = this.gSMslashValue - (((int)this.gSMslashValue/this.TOTAL_BIT_IN_IPv4OCTET) * this.TOTAL_BIT_IN_IPv4OCTET);
 		this.setAmountOfBorrowedBits(borrowedbit);
 		this.setAmountOfHostBits(32 - this.gSMslashValue);
 		if (this.dSMslashValue != 0) {
 			this.setAmountOfBorrowedBits(this.gSMslashValue - this.dSMslashValue);
 		}
+		this.setSIDinBinary();
 	}
 	/**
 	 * Modifier for gSM in /? form
@@ -209,22 +222,21 @@ public class DataObject {
 		this.gSMslashValue = gSMslashValue;
 		//calculating gSM in actual form
 		this.gSM = new int[4];
-		int completeMaskedOctet = (int)this.gSMslashValue/8;
+		int completeMaskedOctet = (int)this.gSMslashValue/TOTAL_BIT_IN_IPv4OCTET;
 		for (int index = 0; index < completeMaskedOctet; index++) {
 			this.gSM[index] = 255;
 		}
-		int borrowedbit = this.gSMslashValue - (completeMaskedOctet * 8);
+		int borrowedbit = this.gSMslashValue - (completeMaskedOctet * TOTAL_BIT_IN_IPv4OCTET);
 		String binary = "";
 		for (int index = 0; index < borrowedbit; index++) {
 			binary = binary + "1";
 		}
-		if (binary.length() != 8) {
-			for (int index = binary.length(); index < 8; index++) { //TODO
+		if (binary.length() != TOTAL_BIT_IN_IPv4OCTET) {
+			for (int index = binary.length(); index < TOTAL_BIT_IN_IPv4OCTET; index++) { 
 				binary = binary + "0";
 			}
 		}
 		this.gSM[completeMaskedOctet] = Integer.parseInt(binary,2);
-		
 		//provoking other modifiers
 		if (this.calculateBorrowedBits) {
 			this.setAmountOfBorrowedBits(borrowedbit);
@@ -233,6 +245,7 @@ public class DataObject {
 		if (this.dSMslashValue != 0 && this.calculateBorrowedBits) {
 			this.setAmountOfBorrowedBits(this.gSMslashValue - this.dSMslashValue);
 		}
+		this.setSIDinBinary();
 	}
 	/**
 	 * @return the s (Amount Of Borrowed Bits)
@@ -246,13 +259,14 @@ public class DataObject {
 	 * @param s {@code int} (Amount Of Borrowed Bits)
 	 */
 	public void setAmountOfBorrowedBits(int s) {
-		int temp_s = (int)s/8;
-		if (s > 8 ) {
+		int temp_s = (int)s/TOTAL_BIT_IN_IPv4OCTET;
+		if (s > TOTAL_BIT_IN_IPv4OCTET ) {
 			this.calculateBorrowedBits = false;
-			this.setGSMslashValue(((this.subnetClassMaskedOctetAmount + temp_s) * 8)+(s - (temp_s * 8)));
+			this.setGSMslashValue(((this.subnetClassMaskedOctetAmount + temp_s) * TOTAL_BIT_IN_IPv4OCTET)+(s - (temp_s * TOTAL_BIT_IN_IPv4OCTET)));
 			this.calculateBorrowedBits = true;
 		}
 		this.s = s;
+		//provoking other modifiers
 		this.setAmountOfSubnet();
 	}
 	/**
@@ -274,10 +288,11 @@ public class DataObject {
 	 */
 	public void setAmountOfSubnet(int S) {
 		this.S = S;
+		//provoking other modifiers
 		this.setAmountOfBorrowedBits();
 	}
 	/**
-	 * modifier for S (Amount of subnet)
+	 * modifier for S (Amount of subnetwork)
 	 */
 	private void setAmountOfSubnet() {
 		S = (int) Math.round(Math.pow(2, s));
@@ -329,10 +344,74 @@ public class DataObject {
 		this.hIP = usableHIp + 2;
 	}
 	/**
-	 * @return the sID {@code int[]}
+	 * @return {@code int[]} sIDinBinary (Subnetwork Address)
 	 */
-	public int[] getsIP() {
-		return sIP;
+	public int[] getSID() {
+		return sID;
+	}
+	/**
+	 * modifier for sID
+	 */
+	private void setSID() {
+		sID = new int[4];
+		for (int octetIndex = 0; octetIndex < this.sIDinBinary.length; octetIndex++) {
+			String octetInString = "";
+			for (int octetBinaryIndex = 0; octetBinaryIndex < this.sIDinBinary[octetIndex].length; octetBinaryIndex++) {
+				if (this.sIDinBinary[octetIndex][octetBinaryIndex] != 0) {
+					octetInString = octetInString + 1;
+				} else {
+					octetInString = octetInString + 0;
+				}
+			}
+			this.sID[octetIndex] = Integer.parseInt(octetInString,2);
+		}
+	}
+	/**
+	 * @return {@code int[][]} sIDinBinary (Subnetwork Address in binary form)
+	 */
+	public int[][] getSIDinBinary() {
+		return sIDinBinary;
+	}
+	
+	private void setSIDinBinary() {
+		sIDinBinary = new int[TOTAL_OCTET_IN_IPv4][TOTAL_BIT_IN_IPv4OCTET];
+		//TODO
+		if (this.gIP != null && this.gSM != null) {
+			boolean[][] binaryGIP = new boolean[TOTAL_OCTET_IN_IPv4][TOTAL_BIT_IN_IPv4OCTET];
+			for (int octetIndex = 0; octetIndex < binaryGIP.length; octetIndex++) {
+				for (int octetBinaryIndex = 0; octetBinaryIndex < this.toBinary(this.gIP[octetIndex]).length; octetBinaryIndex++) {
+					int[] temp = this.toBinary(this.gIP[octetIndex]);
+					if (temp[octetBinaryIndex] != 0) {
+						binaryGIP[octetIndex][octetBinaryIndex] = true;
+					} else {
+						binaryGIP[octetIndex][octetBinaryIndex] = false;
+					}
+				}
+			}
+			boolean[][] binaryGSM = new boolean[TOTAL_OCTET_IN_IPv4][TOTAL_BIT_IN_IPv4OCTET];
+			for (int octetIndex = 0; octetIndex < binaryGSM.length; octetIndex++) {
+				for (int octetBinaryIndex = 0; octetBinaryIndex < this.toBinary(this.gIP[octetIndex]).length; octetBinaryIndex++) {
+					if (this.toBinary(this.gIP[octetIndex])[octetBinaryIndex] != 0) {
+						binaryGSM[octetIndex][octetBinaryIndex] = true;
+					} else {
+						binaryGSM[octetIndex][octetBinaryIndex] = false;
+					}
+				}
+			}
+			String octetInString = "";
+			for (int octetIndex = 0; octetIndex < this.sIDinBinary.length; octetIndex++) {
+				for (int octetBinaryIndex = 0; octetBinaryIndex < this.sIDinBinary[octetIndex].length; octetBinaryIndex++) {
+					if (binaryGIP[octetIndex][octetBinaryIndex] && binaryGSM[octetIndex][octetBinaryIndex]) {
+						this.sIDinBinary[octetIndex][octetBinaryIndex] = 1;
+						octetInString = octetInString + 1;
+					} else {
+						this.sIDinBinary[octetIndex][octetBinaryIndex] = 0;
+						octetInString = octetInString + 0;
+					}
+				}
+			}
+			this.setSID();
+		}
 	}
 	/**
 	 * method to turn an int[] representing an IP into string format
@@ -344,7 +423,7 @@ public class DataObject {
 		int counter = 1;
 		for (int octet : ip) {
 			iP = iP + octet;
-			if (counter < 4) {
+			if (counter < ip.length) {
 				iP = iP + ".";
 			}
 			counter++;
@@ -357,11 +436,17 @@ public class DataObject {
 	 * @return {@code int[]} binary format
 	 */
 	public int[] toBinary(int decimalNumber){
-		int binary[] = new int[8];
+		int binaryReversed[] = new int[TOTAL_BIT_IN_IPv4OCTET];
+		int[] binary = new int[TOTAL_BIT_IN_IPv4OCTET];
 		int index = 0;
 		while(decimalNumber > 0){
-			binary[index++] = decimalNumber%2;
+			binaryReversed[index++] = decimalNumber%2;
 			decimalNumber = decimalNumber/2;
+		}
+		int secoundIndex = 0;
+		for (int firstIndex = binaryReversed.length-1; firstIndex >= 0; firstIndex--) {
+			binary[secoundIndex] = binaryReversed[firstIndex];
+			secoundIndex++;
 		}
 		return binary;
 	}

@@ -57,18 +57,22 @@ public class SubnetCalculator {
 					break;
 				case 4:
 					System.out.println(l.print(40));
+					System.out.print("Enter the amount of subnets can be created: ");
 					dto.setAmountOfSubnet(method.inputInt(keyboard));
 					break;
 				case 5:
 					System.out.println(l.print(40));
+					System.out.print("Enter the amount of host bits: ");
 					dto.setAmountOfHostBits(method.inputInt(keyboard));
 					break;
 				case 6:
 					System.out.println(l.print(40));
+					System.out.print("Enter the amount of host bits: ");
 					dto.setAmountOfHostIP(method.inputInt(keyboard));
 					break;
 				case 7:
 					System.out.println(l.print(40));
+					System.out.print("Enter the amount of host IP can be created: ");
 					dto.setAmountOfUsableHIP(method.inputInt(keyboard));
 				default:
 					System.err.println("Unrecognized Choice!");
@@ -107,12 +111,23 @@ class Methods {
 	}
 	void printTable(DataObject dto) {
 		System.out.println(l.print('+', 40));
+//GIP
 		System.out.print("[1] GIP/HIP");
 		try {
 			System.out.println(":	" + dto.ipToString(dto.getGIP()));
-			System.out.println("Subnet Class:	" + dto.getSubnetClass());
+			System.out.println("    Subnet Class: " + dto.getSubnetClass());
 			try {
-				System.out.println("DSM /" + dto.getDSMslashValue() + "	= " + dto.ipToString(dto.getDSM()));
+				System.out.println("    DSM " + "	= " + dto.ipToString(dto.getDSM()) + "/"+ dto.getDSMslashValue());
+				System.out.print("    ");
+				for (int index = 0; index < dto.getDSM().length; index++) {
+					for (int binaryDigit : dto.toBinary(dto.getDSM()[index]) ) {
+						System.out.print(binaryDigit);
+					}
+					if(index+1<dto.getDSM().length) {
+						System.out.print(".");
+					}
+				}
+				System.out.println("\n");
 			} catch (NullPointerException nullEx) {
 				System.err.print("DSM couldn't be calculated!");
 				switch(dto.getSubnetClass()) {
@@ -127,37 +142,67 @@ class Methods {
 		} catch (NullPointerException nullEx) {
 			System.out.println();
 		}
+//GSM
 		try {
-			System.out.println("[2] GSM /" + dto.getGSMslashValue() + "	= " + dto.ipToString(dto.getGSM()));
-			
+			System.out.println("[2] GSM " + "	= " + dto.ipToString(dto.getGSM()) +"/" + dto.getGSMslashValue());
+			System.out.print("    ");
+			for (int index = 0; index < dto.getGSM().length; index++) {
+				for (int binaryDigit : dto.toBinary(dto.getGSM()[index]) ) {
+					System.out.print(binaryDigit);
+				}
+				if(index+1<dto.getGSM().length) {
+					System.out.print(".");
+				}
+			}
+			System.out.println();
 		} catch (NullPointerException nullEx) {
 			System.out.println("[2] GSM");
 		}
+//s
 		if (dto.getAmountOfBorrowedBits() == 0) {
 			System.out.println("[3] s");
 		} else {
 			System.out.println("[3] s = " + dto.getAmountOfBorrowedBits());
 		}
+//S
 		if (dto.getAmountOfSubnet() == 0) {
 			System.out.println("[4] S");
 		} else {
 			System.out.println("[4] S = " + dto.getAmountOfSubnet());
+			System.out.println();
 		}
+//h
 		if (dto.getAmountOfHostBits() == 0) {
 			System.out.println("[5] h");
 		} else {
 			System.out.println("[5] h = " + dto.getAmountOfHostBits());
 		}
+//HIP
 		if (dto.getAmountOfHostIP() == 0) {
 			System.out.println("[6] Total HIP");
 		} else {
 			System.out.println("[6] Total HIP = " + dto.getAmountOfHostIP());
 		}
+//UsableHIP
 		if (dto.getAmountOfUsableHIP() == 0) {
 			System.out.println("[7] Usable HIP");
 		} else {
 			System.out.println("[7] Usable HIP = " + dto.getAmountOfUsableHIP());
 		}
+//SID
+		if (dto.getSID() != null) {
+			System.out.println();
+			System.out.println("    SID = " + dto.ipToString(dto.getSID()));
+			System.out.print("    ");
+			for(int[] octetInBinary : dto.getSIDinBinary()) {
+				for(int binaryDigit : octetInBinary) {
+					System.out.print(binaryDigit);
+				}
+				System.out.print(".");
+			}
+			System.out.println();
+		}
+//Closing
 		System.out.println(l.print(40));
 		System.out.println("<<PRESS [0] TO CLOSE>>");
 		System.out.print("Enter your choice: ");
