@@ -374,9 +374,8 @@ public class DataObject {
 	}
 	
 	private void setSIDinBinary() {
-		sIDinBinary = new int[TOTAL_OCTET_IN_IPv4][TOTAL_BIT_IN_IPv4OCTET];
-		//TODO
 		if (this.gIP != null && this.gSM != null) {
+			sIDinBinary = new int[TOTAL_OCTET_IN_IPv4][TOTAL_BIT_IN_IPv4OCTET];
 			boolean[][] binaryGIP = new boolean[TOTAL_OCTET_IN_IPv4][TOTAL_BIT_IN_IPv4OCTET];
 			for (int octetIndex = 0; octetIndex < binaryGIP.length; octetIndex++) {
 				for (int octetBinaryIndex = 0; octetBinaryIndex < this.toBinary(this.gIP[octetIndex]).length; octetBinaryIndex++) {
