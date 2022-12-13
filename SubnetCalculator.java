@@ -1,13 +1,13 @@
 import java.util.Scanner;
 /**
  * @author Tanzim Ahmed Sagar
- * @version 1.0
+ * @version 2.0
  */
 public class SubnetCalculator {
 	private static Scanner keyboard = new Scanner(System.in);
 
 	/**
-	 * @param args command line arguments [not implemented yet]
+	 * @param args command line arguments [<u>not implemented yet</u>]
 	 */
 	public static void main(String[] args) {
 		Liner l = new Liner('+');
@@ -18,17 +18,20 @@ public class SubnetCalculator {
 		System.out.println(l.print(40));
 		System.out.println("SUBNET CALCULATOR FOR CST8109");
 		while (restart) {
-			method.printTable(dto);
+			method.printTable(dto); //printing table
 			int usrChoice = method.inputInt(keyboard);
 			switch (usrChoice) {
+			//CLOSE
 				case 0:
 					System.out.println(l.print(40));
 					restart = false;
 					break;
+			//GIP
 				case 1:
 					System.out.println(l.print(40));
 					dto.setGIP(method.inputIP(keyboard));
 					break;
+			//GSM
 				case 2:
 					System.out.println(l.print('-',40));
 					System.out.println("[1] As actual IP address");
@@ -38,50 +41,71 @@ public class SubnetCalculator {
 					int usrChoiceForInputFormat = method.inputInt(keyboard);
 					System.out.println(l.print(40));
 					switch(usrChoiceForInputFormat) {
+				//ACTUAL IP
 					case 1:
 						dto.setGSM(method.inputIP(keyboard));
 						break;
+				//SHORT FORM
 					case 2:
 						System.out.print("Enter the gSM in /? format: ");
 						dto.setGSMslashValue(method.inputInt(keyboard));
 						break;
+				//ERROR
 					default:
 						System.err.println("Invalid Choice!");
 						break;
 					}
 					break;
+			//BORROWED BITS (s)
 				case 3:
 					System.out.println(l.print(40));
 					System.out.print("Enter the amount of borrowed bits: ");
 					dto.setAmountOfBorrowedBits(method.inputInt(keyboard));
 					break;
+			//AMOUNT OF SUBNET (S)
 				case 4:
 					System.out.println(l.print(40));
 					System.out.print("Enter the amount of subnets can be created: ");
 					dto.setAmountOfSubnet(method.inputInt(keyboard));
 					break;
+			//AMOUNT OF HOST BIT (h)
 				case 5:
 					System.out.println(l.print(40));
 					System.out.print("Enter the amount of host bits: ");
 					dto.setAmountOfHostBits(method.inputInt(keyboard));
 					break;
+			//TOTAL HIP
 				case 6:
 					System.out.println(l.print(40));
 					System.out.print("Enter the amount of host bits: ");
 					dto.setAmountOfHostIP(method.inputInt(keyboard));
 					break;
+			//USABLE HIP
 				case 7:
 					System.out.println(l.print(40));
 					System.out.print("Enter the amount of host IP can be created: ");
 					dto.setAmountOfUsableHIP(method.inputInt(keyboard));
+					break;
+			//RESET TABLE
+				case 9:
+					System.out.println(l.print('-',40));
+					dto = new DataObject();
+					System.out.println("Reset Done!");
+					break;
+			//ERROR
 				default:
 					System.err.println("Unrecognized Choice!");
 					break;
 			} // end switch
 		} // end while
 	} // end main
-} // end class
+} // end of outer class
 
+/**
+ * Supplementary class of the main to avoid code redundancy
+ * @author Tanzim Ahmed Sagar
+ * @version 2.0
+ */
 class Methods {
 	private Liner l = new Liner('-');
 	/**
@@ -109,6 +133,11 @@ class Methods {
 		}
 		return value;
 	}
+	/**
+	 * method to print the data table
+	 * @param dto DataObject
+	 * @since 1.0
+	 */
 	void printTable(DataObject dto) {
 		System.out.println(l.print('+', 40));
 //GIP
@@ -160,36 +189,36 @@ class Methods {
 		}
 //s
 		if (dto.getAmountOfBorrowedBits() == 0) {
-			System.out.println("[3] s");
+			System.out.println("[3] borrowed bits (s)");
 		} else {
-			System.out.println("[3] s = " + dto.getAmountOfBorrowedBits());
+			System.out.println("[3] borrowed bits (s) = " + dto.getAmountOfBorrowedBits());
 		}
 //S
 		if (dto.getAmountOfSubnet() == 0) {
-			System.out.println("[4] S");
+			System.out.println("[4] Amount of subnetID can be created (S)");
 		} else {
-			System.out.println("[4] S = " + dto.getAmountOfSubnet());
+			System.out.println("[4] Amount of subnetID can be created (S) = " + dto.getAmountOfSubnet());
 			System.out.println();
 		}
 //h
 		if (dto.getAmountOfHostBits() == 0) {
 			System.out.println("[5] h");
 		} else {
-			System.out.println("[5] h = " + dto.getAmountOfHostBits());
+			System.out.println("[5] Amount of host bits (h) = " + dto.getAmountOfHostBits());
 		}
 //HIP
 		if (dto.getAmountOfHostIP() == 0) {
-			System.out.println("[6] Total HIP");
+			System.out.println("[6] Total HostIP");
 		} else {
-			System.out.println("[6] Total HIP = " + dto.getAmountOfHostIP());
+			System.out.println("[6] Total HostIP = " + dto.getAmountOfHostIP());
 		}
 //UsableHIP
 		if (dto.getAmountOfUsableHIP() == 0) {
-			System.out.println("[7] Usable HIP");
+			System.out.println("[7] Usable HostIP");
 		} else {
-			System.out.println("[7] Usable HIP = " + dto.getAmountOfUsableHIP());
+			System.out.println("[7] Usable HostIP = " + dto.getAmountOfUsableHIP());
 		}
-//SID
+//SubnetID
 		if (dto.getSID() != null) {
 			System.out.println();
 			System.out.println("    SID = " + dto.ipToString(dto.getSID()));
@@ -202,13 +231,25 @@ class Methods {
 			}
 			System.out.println();
 		}
-//Closing
+//BroadcastID
+		if (dto.getBID() != null) {
+			System.out.println();
+			System.out.println("    BroadcastID = " + dto.ipToString(dto.getBID()));
+			System.out.println();
+		}
+//Closing & Reset
 		System.out.println(l.print(40));
-		System.out.println("<<PRESS [0] TO CLOSE>>");
+		System.out.println("<<PRESS [0] TO CLOSE OR [9] TO RESET>>");
 		System.out.print("Enter your choice: ");
 	}
+	/**
+	 * method to input an IP address
+	 * @since 1.0
+	 * @param keyboard {@code Scanner} object
+	 * @return {@code int[]} IP address
+	 */
 	int[] inputIP(Scanner keyboard) {
-		int[] IP = new int[4];
+		int[] IP = new int[4];//instance variable
 		for(int index = 1; index <= 4; index++) {
 			boolean inputIsBad = true;
 			while (inputIsBad) {

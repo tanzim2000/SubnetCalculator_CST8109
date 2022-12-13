@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 /**
  * 
  * @author Tanzim Ahmed Sagar
@@ -10,6 +12,8 @@ public class DataObject {
 	private final int TOTAL_OCTET_IN_IPv4 = 4;
 	/** given IP */
 	private int[] gIP;
+	/** given IP in boolean bits */
+	private boolean[][] booleanGIP;
 	/** subnet class [ABCDEF] */
 	private char subnetClass;
 	/** default subnet mask /? format */
@@ -22,7 +26,7 @@ public class DataObject {
 	private int gSMslashValue;
 	/** borrowed bits */
 	private int s;
-	/** amount of subnets can be created */
+	/** amount of subnetID can be created */
 	private int S;
 	/** amount of host bits */
 	private int h;
@@ -34,12 +38,15 @@ public class DataObject {
 	private int[] sID;
 	/** Subnetwork Address in Binary */
 	private int[][] sIDinBinary;
+	/** Broadcast ID */
+	private int[] bID;
 	//other variables
 	private boolean calculateBorrowedBits = true;
 	private char subnetClassMaskedOctetAmount;
 	
 	
 	/**
+	 * @since 1.0
 	 * @return {@code int[]} gIP
 	 */
 	public int[] getGIP() {
@@ -48,6 +55,7 @@ public class DataObject {
 	/**
 	 * modifier for gIP (given IP)
 	 * also provokes modifiers for subnetwork class
+	 * @since 1.0
 	 * @param gIP the gIP to set
 	 */
 	public void setGIP(int[] gIP) {
@@ -63,6 +71,7 @@ public class DataObject {
 		}
 		if (ipIsValid) {
 			this.gIP = gIP;
+			this.setBooleanGIP();
 			this.setSubnetClass();
 			this.setSIDinBinary();
 		} else {
@@ -70,6 +79,31 @@ public class DataObject {
 		}
 	}
 	/**
+	 * @since 2.0
+	 * @return the gIP in boolean[4][8]
+	 */
+	protected boolean[][] getBooleanGIP() {
+		return booleanGIP;
+	}
+	/**
+	 * Converts int[4] GivenIP to boolean[4][8]
+	 * @since 2.0
+	 */
+	private void setBooleanGIP() {
+		this.booleanGIP = new boolean[TOTAL_OCTET_IN_IPv4][TOTAL_BIT_IN_IPv4OCTET];
+		for (int octetIndex = 0; octetIndex < booleanGIP.length; octetIndex++) {
+			for (int octetBinaryIndex = 0; octetBinaryIndex < this.toBinary(this.gIP[octetIndex]).length; octetBinaryIndex++) {
+				int[] temp = this.toBinary(this.gIP[octetIndex]);
+				if (temp[octetBinaryIndex] != 0) {
+					booleanGIP[octetIndex][octetBinaryIndex] = true;
+				} else {
+					booleanGIP[octetIndex][octetBinaryIndex] = false;
+				}
+			}
+		}
+	}
+	/**
+	 * @since 1.0
 	 * @return Class of the gIP (given IP) in {@code char}
 	 */
 	public char getSubnetClass() {
@@ -77,7 +111,8 @@ public class DataObject {
 	}
 	/**
 	 * updates subnetClass based on gIP
-	 * also triggers all the modifiers of DSM in different form. 
+	 * also triggers all the modifiers of DSM in different form.
+	 * @since 1.0
 	 */
 	private void setSubnetClass() {
 		if (gIP[0] == 0) {
@@ -100,6 +135,7 @@ public class DataObject {
 		this.setDSMslashValue();
 	}
 	/**
+	 * @since 1.0
 	 * @return {@code int} the dSM in /? format
 	 */
 	public int getDSMslashValue() {
@@ -107,6 +143,7 @@ public class DataObject {
 	}
 	/**
 	 * modifier of {@code dSMslashValue}
+	 * @since 1.0
 	 */
 	private void setDSMslashValue() {
 		switch (subnetClass) {
@@ -126,6 +163,7 @@ public class DataObject {
 		}
 	}
 	/**
+	 * @since 1.0
 	 * @return {@code int[]} the dSM
 	 */
 	public int[] getDSM() {
@@ -134,6 +172,7 @@ public class DataObject {
 	/**
 	 * modifier for dSM (default Subnet Mask)
 	 * triggers the modifier of dSMslashValue
+	 * @since 1.0
 	 */
 	private void setDSM() {
 		dSM = new int[4];
@@ -156,12 +195,14 @@ public class DataObject {
 		this.setDSMslashValue();
 	}
 	/**
+	 * @since 1.0
 	 * @return {@code int[]} the gSM
 	 */
 	public int[] getGSM() {
 		return gSM;
 	}
 	/**
+	 * @since 1.0
 	 * @param gSM the gSM to set
 	 */
 	public void setGSM(int[] gSM) {
@@ -184,14 +225,16 @@ public class DataObject {
 		this.setSIDinBinary();
 	}
 	/**
+	 * @since 1.0
 	 * @return the gSMslashValue {@code int}
 	 */
 	public int getGSMslashValue() {
 		return gSMslashValue;
 	}
 	/**
-	 * [PRIVATE] Modifier for gSM in /? form
+	 * Modifier for gSM in /? form
 	 * calculates value based on inputed GSM
+	 * @since 1.0
 	 */
 	private void setGSMslashValue() {
 		gSMslashValue = 0;
@@ -216,6 +259,7 @@ public class DataObject {
 	 * Modifier for gSM in /? form
 	 * also triggers the modifier of s (Amount Of Borrowed Bits)
 	 * and the modifier of h (Amount Of host Bits)
+	 * @since 1.0
 	 * @param gSMslashValue the gSM in /? format
 	 */
 	public void setGSMslashValue(int gSMslashValue) {
@@ -248,6 +292,7 @@ public class DataObject {
 		this.setSIDinBinary();
 	}
 	/**
+	 * @since 1.0
 	 * @return the s (Amount Of Borrowed Bits)
 	 */
 	public int getAmountOfBorrowedBits() {
@@ -256,6 +301,7 @@ public class DataObject {
 	/**
 	 * Modifier for s (Amount Of Borrowed Bits)
 	 * also triggers the modifier of S (Amount of subnet)
+	 * @since 1.0
 	 * @param s {@code int} (Amount Of Borrowed Bits)
 	 */
 	public void setAmountOfBorrowedBits(int s) {
@@ -270,12 +316,14 @@ public class DataObject {
 		this.setAmountOfSubnet();
 	}
 	/**
-	 * Modifier for s (Amount Of Borrowed Bits) using S (Amount Of Subnets)
+	 * Modifier for s (Amount Of Borrowed Bits) using S (Amount Of Subnet)
+	 * @since 1.0
 	 */
 	private void setAmountOfBorrowedBits() {
 		this.s = (int) Math.round(Math.log(S)/Math.log(2));
 	}
 	/**
+	 * @since 1.0
 	 * @return the S {@code int} (Amount Of Subnets)
 	 */
 	public int getAmountOfSubnet() {
@@ -284,6 +332,7 @@ public class DataObject {
 	/**
 	 * modifier for S (Amount of subnet)
 	 * triggers a private modifier of s (Amount Of Borrowed Bits)
+	 * @since 1.0
 	 * @param S {@code int} Amount of subnet
 	 */
 	public void setAmountOfSubnet(int S) {
@@ -293,11 +342,13 @@ public class DataObject {
 	}
 	/**
 	 * modifier for S (Amount of subnetwork)
+	 * @since 1.0
 	 */
 	private void setAmountOfSubnet() {
 		S = (int) Math.round(Math.pow(2, s));
 	}
 	/**
+	 * @since 1.0
 	 * @return the h  {@code int}
 	 */
 	public int getAmountOfHostBits() {
@@ -305,7 +356,8 @@ public class DataObject {
 	}
 	/**
 	 * modifier for h (amount of host bits)
-	 * automatically triggers the modifiers of {@code hIP} and {@code usableHIp}
+	 * automatically updates the value of {@code hIP} and {@code usableHIp}
+	 * @since 1.0
 	 */
 	public void setAmountOfHostBits(int h) {
 		this.h = h;
@@ -313,6 +365,7 @@ public class DataObject {
 		this.usableHIp = this.hIP - 2;
 	}
 	/**
+	 * @since 1.0
 	 * @return the hIP as {@code int}
 	 */
 	public int getAmountOfHostIP() {
@@ -320,6 +373,7 @@ public class DataObject {
 	}
 /**
  * modifier for hIP (Amount Of Host IP)
+	 * @since 1.0
  * @param hIP amount of host IP can be created
  */
 	public void setAmountOfHostIP(int hIP) {
@@ -328,6 +382,7 @@ public class DataObject {
 		this.usableHIp = this.hIP - 2;
 	}
 	/**
+	 * @since 1.0
 	 * @return the usableHIp {@code int}
 	 */
 	public int getAmountOfUsableHIP() {
@@ -337,6 +392,7 @@ public class DataObject {
 	 * modifier for usableHIP
 	 * also generates the value of hIP (Amount Of Host IP)
 	 * and  the value of h (amount of host bits)
+	 * @since 1.0
 	 * @param usableHIp the usableHIp to set
 	 */
 	public void setAmountOfUsableHIP(int usableHIp) {
@@ -344,6 +400,7 @@ public class DataObject {
 		this.hIP = usableHIp + 2;
 	}
 	/**
+	 * @since 1.0
 	 * @return {@code int[]} sIDinBinary (Subnetwork Address)
 	 */
 	public int[] getSID() {
@@ -351,6 +408,8 @@ public class DataObject {
 	}
 	/**
 	 * modifier for sID
+	 * generates SID from boolean[4][8]
+	 * @since 1.0
 	 */
 	private void setSID() {
 		sID = new int[4];
@@ -367,6 +426,7 @@ public class DataObject {
 		}
 	}
 	/**
+	 * @since 1.0
 	 * @return {@code int[][]} sIDinBinary (Subnetwork Address in binary form)
 	 */
 	public int[][] getSIDinBinary() {
@@ -374,19 +434,8 @@ public class DataObject {
 	}
 	
 	private void setSIDinBinary() {
-		if (this.gIP != null && this.gSM != null) {
+		if (this.booleanGIP != null && this.gSM != null) {
 			sIDinBinary = new int[TOTAL_OCTET_IN_IPv4][TOTAL_BIT_IN_IPv4OCTET];
-			boolean[][] binaryGIP = new boolean[TOTAL_OCTET_IN_IPv4][TOTAL_BIT_IN_IPv4OCTET];
-			for (int octetIndex = 0; octetIndex < binaryGIP.length; octetIndex++) {
-				for (int octetBinaryIndex = 0; octetBinaryIndex < this.toBinary(this.gIP[octetIndex]).length; octetBinaryIndex++) {
-					int[] temp = this.toBinary(this.gIP[octetIndex]);
-					if (temp[octetBinaryIndex] != 0) {
-						binaryGIP[octetIndex][octetBinaryIndex] = true;
-					} else {
-						binaryGIP[octetIndex][octetBinaryIndex] = false;
-					}
-				}
-			}
 			boolean[][] binaryGSM = new boolean[TOTAL_OCTET_IN_IPv4][TOTAL_BIT_IN_IPv4OCTET];
 			for (int octetIndex = 0; octetIndex < binaryGSM.length; octetIndex++) {
 				for (int octetBinaryIndex = 0; octetBinaryIndex < this.toBinary(this.gIP[octetIndex]).length; octetBinaryIndex++) {
@@ -400,7 +449,7 @@ public class DataObject {
 			String octetInString = "";
 			for (int octetIndex = 0; octetIndex < this.sIDinBinary.length; octetIndex++) {
 				for (int octetBinaryIndex = 0; octetBinaryIndex < this.sIDinBinary[octetIndex].length; octetBinaryIndex++) {
-					if (binaryGIP[octetIndex][octetBinaryIndex] && binaryGSM[octetIndex][octetBinaryIndex]) {
+					if (booleanGIP[octetIndex][octetBinaryIndex] && binaryGSM[octetIndex][octetBinaryIndex]) {
 						this.sIDinBinary[octetIndex][octetBinaryIndex] = 1;
 						octetInString = octetInString + 1;
 					} else {
@@ -410,10 +459,73 @@ public class DataObject {
 				}
 			}
 			this.setSID();
+			this.setBID();
 		}
 	}
 	/**
+	 * Generates the value of {@code bID}
+	 * @since 2.0
+	 * @param bID the bID to set
+	 */
+	private void setBID() {
+		bID = new int[this.TOTAL_OCTET_IN_IPv4];
+		int classNumber = 0;
+		int[] temp;
+		switch (subnetClass) {
+		case 'A':
+			classNumber = 1;
+			for (int index = 0; index < classNumber; index++) { //copying sID based on the default subnet mask
+				bID[index] = sID[index];
+			}
+			for (int index = classNumber + 1; index < TOTAL_OCTET_IN_IPv4; index++) { //filling the rest of the bID octets
+				bID[index] = 255;
+			}
+			temp = Arrays.copyOf(sIDinBinary[classNumber], sIDinBinary[classNumber].length);
+			for (int index = TOTAL_BIT_IN_IPv4OCTET; index > s; index--) {
+				temp[index-1] = 1; 
+			}
+			bID[classNumber] = this.toDecimal(temp);
+			break;
+		case 'B':
+			classNumber = 2;
+			for (int index = 0; index < classNumber; index++) {
+				bID[index] = sID[index];
+			}
+			for (int index = classNumber + 1; index < TOTAL_OCTET_IN_IPv4; index++) { //filling the rest of the bID octets
+				bID[index] = 255;
+			}
+			temp = Arrays.copyOf(sIDinBinary[classNumber], sIDinBinary[classNumber].length);
+			for (int index = TOTAL_BIT_IN_IPv4OCTET; index > s; index--) {
+				temp[index-1] = 1; 
+			}
+			bID[classNumber] = this.toDecimal(temp);
+			break;
+		case 'C':
+			classNumber = 3;
+			for (int index = 0; index < classNumber; index++) {
+				bID[index] = sID[index];
+			}
+			temp = Arrays.copyOf(sIDinBinary[classNumber], sIDinBinary[classNumber].length);
+			for (int index = TOTAL_BIT_IN_IPv4OCTET; index > s; index--) {
+				temp[index-1] = 1; 
+			}
+			bID[classNumber] = this.toDecimal(temp);
+			break;
+		}
+	}
+	/**
+	 * @since 2.0
+	 * @return the broadcast ID
+	 */
+	public int[] getBID() {
+		return bID;
+	}
+	
+	//Supplementary Methods
+	
+	/**
 	 * method to turn an int[] representing an IP into string format
+	 * @since 1.0
 	 * @param ip IP address in {@code int[]} that needs to be in {@code string}
 	 * @return String representation of the IP address in {@code int[]}
 	 */
@@ -431,6 +543,7 @@ public class DataObject {
 	}
 	/**
 	 * Method to turn an int to an int[] representing the binary format of the int.
+	 * @since 1.0
 	 * @param decimal Decimal version of the {@code int}
 	 * @return {@code int[]} binary format
 	 */
@@ -449,4 +562,20 @@ public class DataObject {
 		}
 		return binary;
 	}
+	/**
+	 * Converts a binary number to its decimal representation.
+	 * @param binary an array of integers representing the binary number
+	 * @return the decimal representation of the binary number
+	 */
+	public int toDecimal(int[] binary) {
+	    int decimal = 0;
+	    for (int i = 0; i < binary.length; i++) {
+	        int bit = binary[binary.length - 1 - i];
+	        if (bit == 1) {
+	            decimal += Math.pow(2, i);
+	        }
+	    }
+	    return decimal;
+	}
+
 }// End of Class
