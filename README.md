@@ -1,6 +1,13 @@
-**CST8109**
-# Subnet Calculator
-Simple Calculator with a text based GUI
+<div align="left">
+  <h1>Subnet Calculator</h1>
+  22F CST8109 Network Programming
+</div>
+
+> **Note**: This project was a part of my classwork
+
+<div align="right">
+  <img src="https://s7494.pcdn.co/wp-content/themes/algonquincollege2018/images/AC-Logo-White.png" alt="Algonquin College Logo" width="200">
+</div>
 
 **Version:** 2.0
 * Added Broadcast ID Calculation
